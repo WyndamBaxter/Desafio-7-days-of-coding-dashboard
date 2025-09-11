@@ -2,3 +2,6 @@ pandas
 numpy
 plotly.express
 streamlit
+openpyxl
+ipython
+nbformat
