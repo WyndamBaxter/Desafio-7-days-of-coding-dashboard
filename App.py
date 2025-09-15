@@ -16,5 +16,5 @@ df_emprestimos_completo = pd.read_parquet('F:/Programação/Desafio-7-days-of-co
 st.sidebar.header("🔎Filtros")
 
 # --- Conteúdo Principal ---
-st.title = ("📚 Dashboard de análises da biblioteca SISBI")
+st.title("Dashboard de análises da biblioteca SISBI")
 st.markdown("Analise bem...")
