@@ -44,9 +44,12 @@ st.subheader('Métricas Gerais')
 if not df_filtrado.empty:
     emprestimos = len(df_filtrado.id_emprestimo.unique())
     exemplares = len(df_filtrado.id_emprestimo)
+    mes_emprestimos_maximo = df_filtrado
 else:
     emprestimos, exemplares = 0, 0
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total de Empréstimos", emprestimos)
 col2.metric('Total de exemplares', exemplares)
+col3.metric('Mês com maior número de empréstimos', exemplares)
+col4.metric('Mês com menor número de empréstimos', exemplares)
