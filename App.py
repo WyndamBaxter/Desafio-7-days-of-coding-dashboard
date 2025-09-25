@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotly_express as px
+import seaborn as sns
 
 #--- Configuração da página ---
 # Definição do título, ícone e o layout para fullpage
@@ -143,20 +144,32 @@ with line_graf2:
          st.warning("Nenhum dado para exibir no gráfico.")
 
 
-bargraf = st.columns(1)
+st.markdown("---")
+st.subheader('Distribuição de Empréstimos por Hora do Dia')
 
-with bargraf:
-    if not df_filtrado.empty:
-        emprestimos_hora = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.hour)['id_emprestimo'].size()
-        emprestimos_hora.index.name = 'hora'
-        emprestimos_hora.name = 'quantidade'
-        emprestimos_hora = emprestimos_hora.reset_index()
+if not df_filtrado.empty:
+        emprestimos_hora = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.hour)['id_emprestimo'].size().reset_index(name='quantidade')
+        emprestimos_hora.rename(columns={'data_emprestimo': 'hora'}, inplace=True)
 
-        emprestimos_hora.plot(
-            kind = 'bar',
+        grafico_emprestimos_hora = px.bar(
+             emprestimos_hora,
+             x = 'hora',
+             y = 'quantidade',
+             color= 'quantidade',
+             color_continuous_scale= 'reds',
+             labels= {
+                'hora': 'Hora do dia',
+                'quantidade': ''
+            },
+            title = 'Quantidade de exemplares emprestados do SISBI ao longo das horas do dia.'
+        )
 
-            )
-        plt.show()
+        st.plotly_chart(grafico_emprestimos_hora, use_container_width=True)
+    
+else:
+        st.warning("Nenhum dado para exibir no gráfico.")
+
+        
 
 
 
