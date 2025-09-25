@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 import plotly_express as px
 
@@ -18,7 +19,7 @@ def load_data():
 
 df_emprestimos_completo = load_data()
 
-# --- Diconário para nomes de mêses
+# --- Dicionário para nomes de mêses
 
 meses_nomes = {
      1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
@@ -31,24 +32,24 @@ meses_nomes = {
 st.sidebar.header("🔎Filtros")
 
 # Filtro de Ano 
-anos_disponiveis = sorted(df_emprestimos_completo.data_emprestimo.dt.year.unique())
+anos_disponiveis = sorted(df_emprestimos_completo['data_emprestimo'].dt.year.unique())
 anos_selecionados = st.sidebar.multiselect('Ano', anos_disponiveis, default=anos_disponiveis) 
 
 # Filtro por Coleção
 
-colecao_disponivel = sorted(df_emprestimos_completo.colecao.unique())
+colecao_disponivel = sorted(df_emprestimos_completo['colecao'].unique())
 colecao_selecionada = st.sidebar.multiselect('Coleção', colecao_disponivel, default= colecao_disponivel)
 
 # Filtro por tipo de vínculo
 
-vinculo_disponivel = sorted(df_emprestimos_completo.tipo_vinculo_usuario.unique())
+vinculo_disponivel = sorted(df_emprestimos_completo['tipo_vinculo_usuario'].unique())
 vinculo_selecionado = st.sidebar.multiselect('Tipo de Vínculo', vinculo_disponivel, default= vinculo_disponivel)
 
 # Filtragem do dataframe
 df_filtrado = df_emprestimos_completo[
-        df_emprestimos_completo.data_emprestimo.dt.year.isin(anos_selecionados)&
-        df_emprestimos_completo.colecao.isin(colecao_selecionada)&
-        df_emprestimos_completo.tipo_vinculo_usuario.isin(vinculo_selecionado)
+        df_emprestimos_completo['data_emprestimo'].dt.year.isin(anos_selecionados)&
+        df_emprestimos_completo['colecao'].isin(colecao_selecionada)&
+        df_emprestimos_completo['tipo_vinculo_usuario'].isin(vinculo_selecionado)
     ]
 
 # --- Conteúdo Principal ---
@@ -60,10 +61,10 @@ st.markdown("Analise bem...")
 st.subheader('Métricas Gerais')
 
 if not df_filtrado.empty:
-    emprestimos = len(df_filtrado.id_emprestimo.unique())
-    exemplares = len(df_filtrado.id_emprestimo)
-    colecao_mais_acessada = df_filtrado.colecao.value_counts().idxmax()
-    vinculo_mais_acessado = df_filtrado.tipo_vinculo_usuario.value_counts().idxmax()
+    emprestimos = len(df_filtrado['id_emprestimo'].unique())
+    exemplares = len(df_filtrado['id_emprestimo'])
+    colecao_mais_acessada = df_filtrado['colecao'].value_counts().idxmax()
+    vinculo_mais_acessado = df_filtrado['tipo_vinculo_usuario'].value_counts().idxmax()
 else:
     emprestimos, exemplares, colecao_mais_acessada, vinculo_mais_acessado = 0, 0, 'Nenhum', 'Nenhuma'
 
@@ -80,8 +81,8 @@ st.header("Gráficos")
 line_graf1, line_graf2 = st.columns(2)
 
 with line_graf1:
-    if  len(df_filtrado.data_emprestimo.value_counts().unique()) > 2:
-        emprestimos_ano = df_filtrado.groupby(df_filtrado.data_emprestimo.dt.year)['id_emprestimo'].size()
+    if  len(df_filtrado['data_emprestimo'].value_counts().unique()) > 2:
+        emprestimos_ano = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.year)['id_emprestimo'].size()
         emprestimos_ano.index.name = 'Ano'
         emprestimos_ano.name = 'Quantidade'
         emprestimos_ano = emprestimos_ano.reset_index()
@@ -111,7 +112,7 @@ with line_graf1:
 
 with line_graf2:
     if not df_filtrado.empty:
-        emprestimos_mes = df_filtrado.groupby(df_filtrado.data_emprestimo.dt.month)['id_emprestimo'].size()
+        emprestimos_mes = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.month)['id_emprestimo'].size()
         emprestimos_mes.index.name = 'mes'
         emprestimos_mes.name = 'quantidade'
         emprestimos_mes = emprestimos_mes.reset_index()
@@ -140,6 +141,22 @@ with line_graf2:
         
     else:
          st.warning("Nenhum dado para exibir no gráfico.")
+
+
+bargraf = st.columns(1)
+
+with bargraf:
+    if not df_filtrado.empty:
+        emprestimos_hora = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.hour)['id_emprestimo'].size()
+        emprestimos_hora.index.name = 'hora'
+        emprestimos_hora.name = 'quantidade'
+        emprestimos_hora = emprestimos_hora.reset_index()
+
+        emprestimos_hora.plot(
+            kind = 'bar',
+
+            )
+        plt.show()
 
 
 
