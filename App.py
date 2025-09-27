@@ -1,8 +1,7 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import pandas as pd
 import plotly_express as px
-import seaborn as sns
+
 
 #--- Configuração da página ---
 # Definição do título, ícone e o layout para fullpage
@@ -15,13 +14,13 @@ st.set_page_config(
 # --- Carregamento de dados ---
 @st.cache_data
 def load_data():
-    df = pd.read_parquet('F:/Programação/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
+    #df = pd.read_parquet('F:/Programação/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
+    df = pd.read_parquet('C:/Users/PC/Desktop/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
     return df
 
 df_emprestimos_completo = load_data()
 
 # --- Dicionário para nomes de mêses
-
 meses_nomes = {
      1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
     5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
@@ -82,12 +81,12 @@ st.header("Gráficos")
 line_graf1, line_graf2 = st.columns(2)
 
 with line_graf1:
-    if  len(df_filtrado['data_emprestimo'].value_counts().unique()) > 2:
-        emprestimos_ano = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.year)['id_emprestimo'].size()
-        emprestimos_ano.index.name = 'Ano'
-        emprestimos_ano.name = 'Quantidade'
-        emprestimos_ano = emprestimos_ano.reset_index()
+    st.subheader('Empréstimos ao longo dos Anos')
+    emprestimos_ano = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.year)['id_emprestimo'].size().reset_index(name='Quantidade')
+    emprestimos_ano.rename(columns={'data_emprestimo': 'Ano'}, inplace=True)
 
+    if  len(emprestimos_ano) > 1:
+        
         grafico_emprestimos_ano = px.line(
             emprestimos_ano,
             x = 'Ano',
@@ -97,7 +96,7 @@ with line_graf1:
                 'Quantidade': 'Empréstimos'
             },
             title = 'Quantidade de exemplares emprestados do SISBI ao longo dos anos',
-            subtitle= '2010 a 2020',
+            subtitle= '2010 a 2020'
             
 
         )
@@ -113,18 +112,13 @@ with line_graf1:
 
 with line_graf2:
     if not df_filtrado.empty:
-        emprestimos_mes = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.month)['id_emprestimo'].size()
-        emprestimos_mes.index.name = 'mes'
-        emprestimos_mes.name = 'quantidade'
-        emprestimos_mes = emprestimos_mes.reset_index()
-        emprestimos_mes['mes'] = emprestimos_mes['mes'].replace({
-
-                1: 'Janeiro', 2: 'Fevereiro', 3:'Março',
-                4: 'Abril', 5: 'Maio', 6: 'Junho',
-                7: 'Julho', 8:'Agosto', 9:'Setembro',
-                10: 'Outubro', 11: 'Novembro', 12:'Dezembro'
-
-            })
+        emprestimos_mes = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.month)['id_emprestimo'].size().reset_index(name='quantidade')
+        emprestimos_mes.rename(columns={'data_emprestimo':'mes'},inplace=True)
+        #ANALISAR ISSO
+        emprestimos_mes['mes'] = emprestimos_mes['mes'].map(meses_nomes)
+        ordem_meses = list(meses_nomes.values())
+        emprestimos_mes['mes'] = pd.Categorical(emprestimos_mes['mes'], categories=ordem_meses, ordered=True)
+        emprestimos_mes = emprestimos_mes.sort_values('mes')
 
         grafico_emprestimos_mes = px.line(
             emprestimos_mes,
