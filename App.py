@@ -14,19 +14,32 @@ st.set_page_config(
 # --- Carregamento de dados ---
 @st.cache_data
 def load_data():
-    #df = pd.read_parquet('F:/Programação/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
-    df = pd.read_parquet('C:/Users/PC/Desktop/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
+    df = pd.read_parquet('F:/Programação/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
+    #df = pd.read_parquet('C:/Users/PC/Desktop/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
     return df
 
 df_emprestimos_completo = load_data()
 
-# --- Dicionário para nomes de mêses
+# --- Dicionário para nomes de mêses ---
 meses_nomes = {
      1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
     5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
     9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
+#Função que gera tabelas de frequência 
+def gera_tabela_frequencia(variavel):
+    '''
+    Esta função irá gerar uma tabela de frequência com percentuais de acordo
+    com a variável passada.
 
+    variavel = variável categórica escolhida de dentro do conjunto de dados
+    emprestimos_completo
+    '''
+    dataframe = df_filtrado[variavel].value_counts()
+    dataframe = dataframe.reset_index()
+    dataframe.columns = [variavel, 'quantidade']
+    dataframe['percentual'] = round((dataframe['quantidade']/dataframe['quantidade'].sum())*100,2)
+    return dataframe
 
 # --- Sidebar (Filtros) ---
 st.sidebar.header("🔎Filtros")
@@ -114,12 +127,14 @@ with line_graf2:
     if not df_filtrado.empty:
         emprestimos_mes = df_filtrado.groupby(df_filtrado['data_emprestimo'].dt.month)['id_emprestimo'].size().reset_index(name='quantidade')
         emprestimos_mes.rename(columns={'data_emprestimo':'mes'},inplace=True)
-        #ANALISAR ISSO
+
+        #Ordenação
         emprestimos_mes['mes'] = emprestimos_mes['mes'].map(meses_nomes)
         ordem_meses = list(meses_nomes.values())
         emprestimos_mes['mes'] = pd.Categorical(emprestimos_mes['mes'], categories=ordem_meses, ordered=True)
         emprestimos_mes = emprestimos_mes.sort_values('mes')
 
+        #Impressão do gráfico
         grafico_emprestimos_mes = px.line(
             emprestimos_mes,
             x = 'mes',
@@ -129,8 +144,6 @@ with line_graf2:
                 'quantidade': ''
             },
             title = 'Quantidade de exemplares emprestados do SISBI ao longo dos mêses.'
-            
-
         )
         st.plotly_chart(grafico_emprestimos_mes, use_container_width=True)
         
@@ -162,6 +175,23 @@ if not df_filtrado.empty:
     
 else:
         st.warning("Nenhum dado para exibir no gráfico.")
+
+st.markdown('----')
+
+st.subheader('Frequencia relativa para o tipo de vinculo dos usuários')
+df_usuario = gera_tabela_frequencia('tipo_vinculo_usuario')
+st.dataframe(df_usuario)
+
+
+st.subheader('Frequencia relativa para o tipo de vinculo dos usuários')
+df_colecao = gera_tabela_frequencia('colecao')
+st.dataframe(df_colecao)
+        
+
+
+st.markdown('----')
+
+st.subheader('Distribuição ')
 
         
 
