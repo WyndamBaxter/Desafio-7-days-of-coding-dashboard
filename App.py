@@ -176,24 +176,27 @@ if not df_filtrado.empty:
 else:
         st.warning("Nenhum dado para exibir no gráfico.")
 
+#Melhorar isso....
 st.markdown('----')
-
-st.subheader('Frequencia relativa para o tipo de vinculo dos usuários')
-df_usuario = gera_tabela_frequencia('tipo_vinculo_usuario')
-st.dataframe(df_usuario)
+st.header('Análise de Frequências Relativas')
 
 
-st.subheader('Frequencia relativa para o tipo de vinculo dos usuários')
-df_colecao = gera_tabela_frequencia('colecao')
-st.dataframe(df_colecao)
-        
+#Mapeamento para resumir títulos
 
+analises = {
+     'tipo_vinculo_usuario': 'Por Tipo de Vínculo dos Usuários',
+     'colecao': 'Por Coleção',
+     'biblioteca': 'Por Biblioteca',
+     'classe_CDU': 'Por Classe CDU'
+}
 
-st.markdown('----')
+for coluna, titulo in analises.items():
+     st.subheader(titulo)
+     df = gera_tabela_frequencia(coluna)
+     st.dataframe(df)
 
-st.subheader('Distribuição ')
+#Você precisa melhorar a visualização das tabelas, pegar dica na conversa com o Gemini
 
-        
 
 
 
