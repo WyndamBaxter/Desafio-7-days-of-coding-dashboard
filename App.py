@@ -184,18 +184,51 @@ st.header('Análise de Frequências Relativas')
 #Mapeamento para resumir títulos
 
 analises = {
-     'tipo_vinculo_usuario': 'Por Tipo de Vínculo dos Usuários',
-     'colecao': 'Por Coleção',
-     'biblioteca': 'Por Biblioteca',
-     'classe_CDU': 'Por Classe CDU'
+     'tipo_vinculo_usuario': 'Tipo de Vínculo dos Usuários',
+     'colecao': 'Coleção',
+     'biblioteca': 'Biblioteca',
+     'classe_CDU': 'Classe CDU'
 }
 
-for coluna, titulo in analises.items():
-     st.subheader(titulo)
-     df = gera_tabela_frequencia(coluna)
-     st.dataframe(df)
+# Cria as abas a partir dos valores do dicionário
 
-#Você precisa melhorar a visualização das tabelas, pegar dica na conversa com o Gemini
+lista_nomes_de_abas = list(analises.values())
+abas = st.tabs(lista_nomes_de_abas)
+
+# Itera sobre o dicionário e as abas para popular o conteúdo
+
+for i, (coluna, titulo) in enumerate(analises.items()):
+     with abas[i]:
+          st.subheader(f'Análise para: {titulo}')
+            
+          df = gera_tabela_frequencia(coluna)
+          
+          if not df.empty:
+               
+            # Prepara o dataframe para o gráfico: a primeira coluna se torna o índice
+            # Isso é crucial para st.bar_chart funcionar corretamente
+               
+                df_para_grafico = df.set_index(df.columns[0])
+
+            # Use colunas para organizar o layout
+                col9, col10 = st.columns([0.4, 0.6])
+            
+                with col9:
+                    st.write('Tabela de Frequência')
+                    st.dataframe(df, use_container_width=True)
+                
+                with col10:
+                    st.write('Gráfico de Frequência')      
+                    st.bar_chart(df_para_grafico)
+          else:
+               st.warning('Não há dados para exibir esta categoria')
+                
+
+
+
+          
+         
+         
 
 
 
