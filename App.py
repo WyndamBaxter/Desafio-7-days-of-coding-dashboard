@@ -176,10 +176,9 @@ if not df_filtrado.empty:
 else:
         st.warning("Nenhum dado para exibir no gráfico.")
 
-#Melhorar isso....
+
 st.markdown('----')
 st.header('Análise de Frequências Relativas')
-
 
 #Mapeamento para resumir títulos
 
@@ -222,6 +221,8 @@ for i, (coluna, titulo) in enumerate(analises.items()):
                     st.bar_chart(df_para_grafico)
           else:
                st.warning('Não há dados para exibir esta categoria')
+
+               #Verificar possibilidade de usar o plotly-express REFATORAR ESSE CÒDIGO ATÉ ENTENDER
                 
 
 
