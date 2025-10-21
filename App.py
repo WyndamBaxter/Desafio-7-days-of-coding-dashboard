@@ -6,7 +6,7 @@ import plotly_express as px
 #--- Configuração da página ---
 # Definição do título, ícone e o layout para fullpage
 st.set_page_config(
-    page_title= 'Dashboard de análises da biblioteca SISBI',
+    page_title= 'Dashboard de análises do SISBI',
     page_icon= '📚',
     layout='wide'
 )
@@ -26,7 +26,7 @@ meses_nomes = {
     5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
     9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
 }
-#Função que gera tabelas de frequência 
+# ---Função que gera tabelas de frequência---
 def gera_tabela_frequencia(variavel):
     '''
     Esta função irá gerar uma tabela de frequência com percentuais de acordo
@@ -67,8 +67,7 @@ df_filtrado = df_emprestimos_completo[
 
 # --- Conteúdo Principal ---
 
-st.title("Dashboard de análise dos empréstimos da biblioteca SISBI")
-st.markdown("Analise bem...")
+st.title("Dashboard de análise dos empréstimos do SISBI")
 
 # --- Métricas Gerais ---
 st.subheader('Métricas Gerais')
@@ -214,7 +213,7 @@ for i, (coluna, titulo) in enumerate(analises.items()):
             
                 with col9:
                     st.write('Tabela de Frequência')
-                    st.dataframe(df, use_container_width=True)
+                    st.dataframe(df, width='stretch')
                 
                 with col10:
                     st.write('Gráfico de Frequência')      
@@ -224,6 +223,88 @@ for i, (coluna, titulo) in enumerate(analises.items()):
 
                #Verificar possibilidade de usar o plotly-express REFATORAR ESSE CÒDIGO ATÉ ENTENDER
                 
+st.markdown('---')
+st.header('Distribuição de empréstimos mensais do Acervo Circulante')
+st.subheader('Por Alunos de Graduação ')
+
+if not df_filtrado.empty:
+     
+    alunos_graduacao = df_filtrado.query('tipo_vinculo_usuario == "ALUNO DE GRADUAÇÃO"')
+    alunos_graduacao_acervo_circulante = alunos_graduacao.query('colecao == "Acervo Circulante"')
+    alunos_graduacao_acervo_circulante['ano'] = alunos_graduacao_acervo_circulante['data_emprestimo'].dt.year
+    alunos_graduacao_acervo_circulante['mes'] = alunos_graduacao_acervo_circulante['data_emprestimo'].dt.month
+    alunos_graduacao_acervo_circulante = alunos_graduacao_acervo_circulante[['ano', 'mes']]
+    alunos_graduacao_acervo_circulante = alunos_graduacao_acervo_circulante.value_counts().to_frame('quantidade').reset_index()
+
+    if not alunos_graduacao_acervo_circulante.empty:
+
+        #Plotando o gráfico
+
+        boxplot_colecao = px.box(
+            alunos_graduacao_acervo_circulante,
+            x = 'ano',
+            y = 'quantidade'
+        )
+
+        boxplot_colecao.update_layout(
+            
+            xaxis = {
+                'tickmode': 'linear',
+                'title': None,
+            },
+            yaxis = {
+                'title': None
+            }
+        )
+
+        st.plotly_chart(boxplot_colecao, use_container_width=True)
+    else:
+        st.warning("Nenhum dado para exibir no gráfico.")
+else:
+     st.warning("Nenhum dado para exibir no gráfico.")
+
+st.markdown("---")
+st.subheader('Por Alunos de Pós - Graduação do Acervo Circulante')
+
+if not df_filtrado.empty:
+     
+    alunos_pos_graduacao = df_filtrado.query('tipo_vinculo_usuario == "ALUNO DE PÓS-GRADUAÇÃO"')
+    alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao.query('colecao == "Acervo Circulante"')
+    alunos_pos_graduacao_acervo_circulante['ano'] = alunos_pos_graduacao_acervo_circulante['data_emprestimo'].dt.year
+    alunos_pos_graduacao_acervo_circulante['mes'] = alunos_pos_graduacao_acervo_circulante['data_emprestimo'].dt.month
+    alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao_acervo_circulante[['ano', 'mes']]
+    alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao_acervo_circulante.value_counts().to_frame('quantidade').reset_index()
+    
+    if not alunos_pos_graduacao_acervo_circulante.empty:
+    
+    #Plotando o gráfico
+
+        boxplot_colecao_pos = px.box(
+            alunos_pos_graduacao_acervo_circulante,
+            x = 'ano',
+            y = 'quantidade'
+        )
+
+        boxplot_colecao_pos.update_layout(
+            
+            xaxis = {
+                'tickmode': 'linear',
+                'title': None,
+            },
+            yaxis = {
+                'title': None
+            }
+        )
+        st.plotly_chart(boxplot_colecao_pos, key= 'pos_graduacao', use_container_width=True)
+    else:
+         st.warning("Nenhum dado para exibir no gráfico.")    
+else:
+     st.warning("Nenhum dado para exibir no gráfico.")
+
+st.markdown("---")
+st.markdown("Detalhes do dataframe")
+st.dataframe(df_filtrado.head(50))
+    
 
 
 
