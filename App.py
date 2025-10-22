@@ -230,7 +230,7 @@ st.subheader('Por Alunos de Graduação ')
 if not df_filtrado.empty:
      
     alunos_graduacao = df_filtrado.query('tipo_vinculo_usuario == "ALUNO DE GRADUAÇÃO"')
-    alunos_graduacao_acervo_circulante = alunos_graduacao.query('colecao == "Acervo Circulante"')
+    alunos_graduacao_acervo_circulante = alunos_graduacao.query('colecao == "Acervo Circulante"').copy()
     alunos_graduacao_acervo_circulante['ano'] = alunos_graduacao_acervo_circulante['data_emprestimo'].dt.year
     alunos_graduacao_acervo_circulante['mes'] = alunos_graduacao_acervo_circulante['data_emprestimo'].dt.month
     alunos_graduacao_acervo_circulante = alunos_graduacao_acervo_circulante[['ano', 'mes']]
@@ -269,7 +269,7 @@ st.subheader('Por Alunos de Pós - Graduação do Acervo Circulante')
 if not df_filtrado.empty:
      
     alunos_pos_graduacao = df_filtrado.query('tipo_vinculo_usuario == "ALUNO DE PÓS-GRADUAÇÃO"')
-    alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao.query('colecao == "Acervo Circulante"')
+    alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao.query('colecao == "Acervo Circulante"').copy()
     alunos_pos_graduacao_acervo_circulante['ano'] = alunos_pos_graduacao_acervo_circulante['data_emprestimo'].dt.year
     alunos_pos_graduacao_acervo_circulante['mes'] = alunos_pos_graduacao_acervo_circulante['data_emprestimo'].dt.month
     alunos_pos_graduacao_acervo_circulante = alunos_pos_graduacao_acervo_circulante[['ano', 'mes']]
