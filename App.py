@@ -15,7 +15,7 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     #df = pd.read_parquet('F:/Programação/Desafio-7-days-of-coding-dashboard/resultados/df_emprestimos_completo.parquet')
-    df = pd.read_parquet('resultados\df_emprestimos_completo.parquet')
+    df = pd.read_parquet('resultados/df_emprestimos_completo.parquet')
     return df
 
 df_emprestimos_completo = load_data()
